@@ -691,7 +691,8 @@ const splitLabel = (label: string, maxLen = 16) => {
   return lines;
 };
 
-const renderDeptTick = (props: any) => {
+// 1) حوّل الدالة إلى مكوّن React
+const PolarDeptTick: React.FC<any> = (props) => {
   const { x, y, cx, cy, payload } = props;
   const label = payload?.value || '';
   const neat = label
@@ -719,7 +720,7 @@ const renderDeptTick = (props: any) => {
       fill="#7A5A0A"
       style={{ pointerEvents: 'none' }}
     >
-      {lines.map((ln, i) => (
+      {lines.map((ln: string, i: number) => (
         <tspan key={i} x={lx} dy={i === 0 ? startDy : lineHeight}>
           {ln}
         </tspan>
@@ -727,6 +728,7 @@ const renderDeptTick = (props: any) => {
     </text>
   );
 };
+
 
 /* ==================== تبويب إحصائية طرابلس ==================== */
 /* ==================== تبويب إحصائية طرابلس (نسخة موحّدة) ==================== */
@@ -829,12 +831,15 @@ function TripoliMonthlyTab({
         {/* الرادار كما هو */}
         <div className="h-[360px] rounded-xl border border-black/10 bg-white/60 p-3">
           <ResponsiveContainer width="100%" height="100%" debounce={200} className="chart-wrap">
-            <RadarChart data={barDataTripoli} cx="50%" cy="50%" outerRadius="72%" margin={{ top: 16, bottom: 5, left: 16, right: 16 }}>
-              <PolarGrid gridType="polygon" />
-              <PolarAngleAxis dataKey="dept" tick={renderDeptTick} tickMargin={12} />
-              <PolarRadiusAxis />
-              <Tooltip content={<PrettyTooltip />} />
-              <Legend verticalAlign="bottom" align="center" iconType="circle" wrapperStyle={{ marginTop: 20, fontSize: 13 }} />
+          <RadarChart data={barDataTripoli} cx="50%" cy="50%" outerRadius="72%" margin={{ top: 16, bottom: 5, left: 16, right: 16 }}>
+  <PolarGrid gridType="polygon" />
+  {/* 2) مرّر عنصر بدل الدالة، واحذف tickMargin */}
+  <PolarAngleAxis dataKey="dept" tick={<PolarDeptTick />} />
+  <PolarRadiusAxis />
+  <Tooltip content={<PrettyTooltip />} />
+  <Legend verticalAlign="bottom" align="center" iconType="circle" wrapperStyle={{ marginTop: 20, fontSize: 13 }} />
+ 
+
               <Radar name="إجمالي" dataKey="total"  stroke={GOLD}      fill={GOLD}      fillOpacity={0.14} />
               <Radar name="منجز"  dataKey="done"   stroke={GOLD_SOFT}  fill={GOLD_SOFT}  fillOpacity={0.25} />
               <Radar name="متبقي" dataKey="remain" stroke={GOLD_DARK}  fill={GOLD_DARK}  fillOpacity={0.20} />
@@ -1146,7 +1151,7 @@ function makeDemo() {
     const total  = 6 + Math.floor(Math.random()*12);
     const done   = Math.floor(total * (0.4 + Math.random()*0.5));
     const remain = Math.max(total - done, 0);
-    const statuses = ['awaiting_inspection','noted','finalized'];
+    const statuses = ['بانتظار التفتيش','مراجَع','مكتمل'];
     const status = pick(statuses);
     const branch = pick(BRANCHES).name;
     surveysAll.push({
